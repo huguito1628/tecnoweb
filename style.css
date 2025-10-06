@@ -1,0 +1,134 @@
+/* ===========================
+   ABBA JHIRE CORPORATION LOGIN
+   Diseño elegante y tecnológico
+=========================== */
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: radial-gradient(circle at center, #0a0a0a, #050505, #000);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fondo de partículas */
+#particles-js {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.auth-container {
+  background: rgba(15, 15, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 40px;
+  width: 380px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+  animation: fadeIn 1s ease;
+  z-index: 1;
+}
+
+.auth-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00ffff;
+  letter-spacing: 2px;
+}
+
+.form-control {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 10px #00ffff;
+  border-color: #00ffff;
+  
+}
+
+.btn-tech {
+  background: linear-gradient(90deg, #00ffff, #007bff);
+  border: none;
+  width: 100%;
+  font-weight: bold;
+  color: #000;
+  transition: 0.3s ease;
+}
+
+.btn-tech:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg, #007bff, #00ffff);
+}
+
+.toggle-link {
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+  color: #00ffff;
+  transition: 0.3s;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===========================
+   TÍTULO PRINCIPAL
+=========================== */
+.main-title {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  margin-top: -150px;
+  margin-left: -10px;
+  color: #00f5ff;
+  text-shadow: 0 0 10px #00f5ff, 0 0 20px #007bff;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 4px;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+.main-title h1 {
+  font-size: 3rem;
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+.main-title p {
+  font-size: 1.2rem;
+  color: #fff;
+  opacity: 0.8;
+  letter-spacing: 2px;
+  margin-top: 0;
+}
+
+/* Animación de brillo futurista */
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #00f5ff, 0 0 20px #007bff, 0 0 30px #007bff;
+  }
+  to {
+    text-shadow: 0 0 20px #00f5ff, 0 0 40px #00bfff, 0 0 60px #0099ff;
+  }
+}
