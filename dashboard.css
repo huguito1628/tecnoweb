@@ -128,11 +128,18 @@ body {
   text-align: center;
   padding: 1.5rem;
   transition: transform 0.3s, box-shadow 0.3s;
+  color: #fff !important; /* forzar texto blanco */
+}
+
+.stat-card h4,      /* títulos como Ventas, Clientes, etc. */
+.stat-card p,       /* valores o descripciones */
+.stat-card span {
+  color: #fff !important; /* forzar texto blanco */
 }
 
 .stat-card i {
   font-size: 2rem;
-  color: #00fff0;
+  color: #00fff0; /* mantener iconos cian */
   margin-bottom: 0.5rem;
 }
 
@@ -157,4 +164,7 @@ body {
   text-align: center;
   color: #00fff0;
   margin-top: 1.5rem;
+}
+.menu-btn {
+  margin-right: 20px;
 }
