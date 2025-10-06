@@ -5,6 +5,7 @@ window.addEventListener('load', () => {
   if (localStorage.getItem('sessionActive') === 'true') {
     window.location.href = 'index.html';
   } else {
+    // Mostrar contenedor principal
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('.main-wrapper').style.opacity = '1';
     });
@@ -20,7 +21,7 @@ function toggleForms() {
 }
 
 // =========================
-// HASH SHA-256
+// FUNCION HASH SHA-256
 // =========================
 async function sha256(str) {
   const buffer = new TextEncoder("utf-8").encode(str);
@@ -31,30 +32,32 @@ async function sha256(str) {
 }
 
 // =========================
-// REGISTRO
+// REGISTRO DE USUARIO
 // =========================
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = e.target.registerEmail.value.trim();
   const password = e.target.registerPassword.value;
 
+  // Validar contraseña
   if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
     alert("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
     return;
   }
 
-  // Leer usuarios actuales desde localStorage
+  // Cargar usuarios actuales
   let users = JSON.parse(localStorage.getItem("users") || "{}");
 
+  // Verificar si el usuario ya existe
   if (users[email]) {
     alert("El usuario ya existe.");
     return;
   }
 
+  // Guardar usuario con password hasheado
   const hashed = await sha256(password);
   users[email] = hashed;
-
-  // Guardar de vuelta en localStorage
   localStorage.setItem("users", JSON.stringify(users));
 
   alert("Registro exitoso. Ahora puedes iniciar sesión.");
@@ -62,18 +65,20 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 });
 
 // =========================
-// LOGIN
+// LOGIN SEGURO CON SESIÓN
 // =========================
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = e.target.loginEmail.value.trim();
   const password = e.target.loginPassword.value;
 
-  // Leer usuarios actuales desde localStorage
+  // Cargar usuarios actuales
   let users = JSON.parse(localStorage.getItem("users") || "{}");
   const hashed = await sha256(password);
 
   if (users[email] && users[email] === hashed) {
+    // Guardar sesión
     localStorage.setItem("sessionActive", "true");
     localStorage.setItem("sessionUser", email);
     window.location.href = "index.html";
@@ -83,7 +88,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 });
 
 // =========================
-// PARTICULAS
+// SISTEMA DE PARTÍCULAS
 // =========================
 tsParticles.load("particles-js", {
   background: { color: "#000" },
@@ -111,6 +116,3 @@ tsParticles.load("particles-js", {
   },
   detectRetina: true
 });
-
-
-
