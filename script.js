@@ -4,6 +4,11 @@
 window.addEventListener('load', () => {
   if (localStorage.getItem('sessionActive') === 'true') {
     window.location.href = 'index.html';
+  } else {
+    // Mostrar contenedor principal
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('.main-wrapper').style.opacity = '1';
+    });
   }
 });
 
@@ -16,37 +21,45 @@ function toggleForms() {
 }
 
 // =========================
-// REGISTRO DE USUARIO
+// FUNCION HASH SHA-256
 // =========================
-const users = JSON.parse(localStorage.getItem("users") || "{}");
-
 async function sha256(str) {
   const buffer = new TextEncoder("utf-8").encode(str);
-  return crypto.subtle.digest("SHA-256", buffer).then(hash =>
-    Array.from(new Uint8Array(hash))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("")
-  );
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
+// =========================
+// REGISTRO DE USUARIO
+// =========================
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = e.target.registerEmail.value.trim();
   const password = e.target.registerPassword.value;
 
+  // Validar contraseña
   if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
     alert("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
     return;
   }
 
+  // Cargar usuarios actuales
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+  // Verificar si el usuario ya existe
   if (users[email]) {
     alert("El usuario ya existe.");
     return;
   }
 
+  // Guardar usuario con password hasheado
   const hashed = await sha256(password);
   users[email] = hashed;
   localStorage.setItem("users", JSON.stringify(users));
+
   alert("Registro exitoso. Ahora puedes iniciar sesión.");
   toggleForms();
 });
@@ -56,14 +69,18 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // =========================
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const email = e.target.loginEmail.value.trim();
   const password = e.target.loginPassword.value;
+
+  // Cargar usuarios actuales
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
   const hashed = await sha256(password);
 
   if (users[email] && users[email] === hashed) {
-    // Guardar sesión en localStorage
+    // Guardar sesión
     localStorage.setItem("sessionActive", "true");
-    localStorage.setItem("sessionUser", email); // opcional, para mostrar usuario en index
+    localStorage.setItem("sessionUser", email);
     window.location.href = "index.html";
   } else {
     alert("Credenciales incorrectas.");
@@ -71,7 +88,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 });
 
 // =========================
-// SISTEMA DE PARTÍCULAS (mantener igual)
+// SISTEMA DE PARTÍCULAS
 // =========================
 tsParticles.load("particles-js", {
   background: { color: "#000" },
@@ -99,3 +116,5 @@ tsParticles.load("particles-js", {
   },
   detectRetina: true
 });
+
+
