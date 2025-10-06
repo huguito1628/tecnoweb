@@ -16,6 +16,33 @@
 
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- =========================
+       OCULTAR CONTENIDO HASTA VERIFICAR SESIÓN
+  ========================= -->
+  <style>
+    .main-wrapper {
+      opacity: 0;           /* Oculto inicialmente */
+      transition: opacity 0.3s ease; /* Suave transición */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;    /* Centrado vertical */
+    }
+  </style>
+  <script>
+    const sessionActive = localStorage.getItem('sessionActive');
+    if (sessionActive === 'true') {
+      // Si ya hay sesión, redirige al dashboard inmediatamente
+      window.location.href = 'index.html'; // Cambia si tu dashboard tiene otro nombre
+    } else {
+      // Mostrar el contenedor si no hay sesión activa
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.main-wrapper').style.opacity = '1';
+      });
+    }
+  </script>
 </head>
 
 <body>
@@ -26,7 +53,7 @@
   <div class="main-wrapper">
     
     <!-- Título principal -->
-    <header class="main-title">
+    <header class="main-title text-center mb-4">
       <h1>ABBA JHIRE</h1>
       <p>Corporation</p>
     </header>
@@ -45,7 +72,7 @@
         </div>
         <button type="submit" class="btn btn-tech mt-3">Iniciar sesión</button>
       </form>
-      <div class="toggle-link" onclick="toggleForms()">¿No tienes cuenta? Regístrate</div>
+      <div class="toggle-link mt-2" onclick="toggleForms()">¿No tienes cuenta? Regístrate</div>
     </div>
 
     <!-- Registro -->
@@ -65,7 +92,7 @@
         </div>
         <button type="submit" class="btn btn-tech mt-3">Registrar</button>
       </form>
-      <div class="toggle-link" onclick="toggleForms()">¿Ya tienes cuenta? Inicia sesión</div>
+      <div class="toggle-link mt-2" onclick="toggleForms()">¿Ya tienes cuenta? Inicia sesión</div>
     </div>
 
   </div>
