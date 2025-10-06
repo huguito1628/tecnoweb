@@ -102,7 +102,6 @@ body {
   z-index: 10;
   text-align: center;
   margin-top: -150px;
-  margin-right: -5px;
   color: #00f5ff;
   text-shadow: 0 0 10px #00f5ff, 0 0 20px #007bff;
   font-family: 'Orbitron', sans-serif;
@@ -132,3 +131,4 @@ body {
     text-shadow: 0 0 20px #00f5ff, 0 0 40px #00bfff, 0 0 60px #0099ff;
   }
 }
+
