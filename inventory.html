@@ -243,6 +243,42 @@
     const sidebar = document.getElementById("sidebar");
     document.getElementById("menuToggle").addEventListener("click", () => sidebar.classList.add("show-sidebar"));
     document.getElementById("closeSidebar").addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
+
+
+        // ---- ALERTA DE STOCK BAJO ----
+        function verificarStockBajo() {
+      const nivelAlerta = parseInt(localStorage.getItem('nivelStockBajo')) || 2;
+      const productosBajos = productos.filter(p => p.stock <= nivelAlerta);
+
+      const alertaExistente = document.getElementById('alertaStock');
+      if (alertaExistente) alertaExistente.remove();
+
+      if (productosBajos.length > 0) {
+        const alerta = document.createElement('div');
+        alerta.id = 'alertaStock';
+        alerta.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-3 shadow-lg';
+        alerta.style.zIndex = '9999';
+        alerta.innerHTML = `
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong> Atención:</strong> ${productosBajos.length} producto(s) con stock bajo.
+          <button type="button" class="btn btn-sm btn-outline-light ms-3" onclick="mostrarDetallesStockBajo()">Ver detalles</button>
+        `;
+        document.body.appendChild(alerta);
+      }
+    }
+
+    function mostrarDetallesStockBajo() {
+      const nivelAlerta = parseInt(localStorage.getItem('nivelStockBajo')) || 2;
+      const productosBajos = productos.filter(p => p.stock <= nivelAlerta);
+      let mensaje = '⚠️ Productos con stock bajo:\n\n';
+      productosBajos.forEach(p => mensaje += `${p.producto} → Stock: ${p.stock}\n`);
+      alert(mensaje);
+    }
+
+    // Ejecutar verificación al cargar
+    document.addEventListener('DOMContentLoaded', verificarStockBajo);
+
   </script>
+  
 </body>
 </html>
