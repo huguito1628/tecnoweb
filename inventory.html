@@ -39,15 +39,13 @@
       border-color: #fff;
     }
 
-    .product-image-placeholder {
+    .product-image {
       height: 150px;
-      background-color: rgba(255, 255, 255, 0.05);
+      object-fit: contain;
+      width: 100%;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 3rem;
+      border-radius: 6px 6px 0 0;
+      background-color: rgba(255, 255, 255, 0.05);
     }
 
     .stock-indicator {
@@ -162,29 +160,30 @@
 
   <script>
     const productos = [
-      { id: "SC-57BT", producto: "Scorpion SC-57BT", marca: "Scorpion", categoria: "Audio", stock: 7, precio: 90.0 },
-      { id: "SH-PGA48", producto: "Shure PGA-48", marca: "Shure", categoria: "Audio", stock: 3, precio: 120.0 },
-      { id: "SH-PGA58-R", producto: "Shure PGA-58 (réplica)", marca: "Shure", categoria: "Audio", stock: 3, precio: 80.0 },
-      { id: "SH-SM58-R", producto: "Shure SM-58 (réplica)", marca: "Shure", categoria: "Audio", stock: 2, precio: 100.0 },
-      { id: "SH-BETA57A", producto: "Shure Beta 57A", marca: "Shure", categoria: "Audio", stock: 2, precio: 130.0 },
-      { id: "HM-01", producto: "Máquina de humo (unidad)", marca: "Genérica", categoria: "Audio", stock: 2, precio: 130.0 },
-      { id: "EALSEN-1", producto: "Micrófono inalámbrico Ealsen", marca: "Ealsen", categoria: "Audio", stock: 2, precio: 120.0 },
-      { id: "ONTOP-HIGH", producto: "Micrófono gama alta On-TOP", marca: "On-TOP", categoria: "Audio", stock: 1, precio: 550.0 },
-      { id: "BB-BT668N", producto: "BlackBlack BT-668N", marca: "BlackBlack", categoria: "Audio", stock: 1, precio: 140.0 },
-      { id: "TUMAN-X4", producto: "Micrófono x4 Tuman (pack)", marca: "Tuman", categoria: "Audio", stock: 5, precio: 280.0 },
-      { id: "OP-9011B", producto: "Kit Solar / Linterna OPALUX", marca: "Opalux", categoria: "Tecnología", stock: 20, precio: 120.0 },
-      { id: "BT-149-C", producto: "SET-5 Colores Bolsa / Esponja Micrófono “Batblack”", marca: "Batblack", categoria: "Audio", stock: 5, precio: 16.0 },
-      { id: "PSBRS", producto: "Consola Digital PRO SERIES (8 canales)", marca: "ProSeries", categoria: "Audio", stock: 2, precio: 450.0 },
-      { id: "BT-U168", producto: "Micrófono Pro Batblack inalámbrico UHF", marca: "Batblack", categoria: "Audio", stock: 2, precio: 420.0 },
-      { id: "BT-4D2C", producto: "Consola Amplificada Batblack 600W", marca: "Batblack", categoria: "Audio", stock: 1, precio: 450.9 },
-      { id: "CAJA15B", producto: "Caja Amplificada 15”", marca: "Genérica", categoria: "Audio", stock: 2, precio: 900.0 },
-      { id: "CHARG-USB-C", producto: "Cargador Rápido USB-C", marca: "Genérica", categoria: "Tecnología", stock: 10, precio: 8.0 },
-      { id: "SOP-MAG", producto: "Soporte Magnético Celular", marca: "Genérica", categoria: "Tecnología", stock: 8, precio: 35.0 },
-      { id: "BTD9G", producto: "Micrófono profesional Batblack inalámbrico UHF", marca: "Batblack", categoria: "Audio", stock: 11, precio: 259.0 },
-      { id: "BTN-58B", producto: "Micrófono Batblack dinámico profesional unidireccional", marca: "Batblack", categoria: "Audio", stock: 4, precio: 75.0 },
-      { id: "BTP4X", producto: "Mixer 4 canales profesional Batblack 15V", marca: "Batblack", categoria: "Audio", stock: 3, precio: 220.0 },
-      { id: "SNH", producto: "Micrófono Sennheiser E85", marca: "Sennheiser", categoria: "Audio", stock: 0, precio: 120.0 }
+      { id: "SC-57BT", producto: "Scorpion SC-57BT", marca: "Scorpion", categoria: "Audio", stock: 7, precio: 90.0, imagen: "images/SC-57BT.jpg" },
+      { id: "SH-PGA48", producto: "Shure PGA-48", marca: "Shure", categoria: "Audio", stock: 3, precio: 120.0, imagen: "images/SH-PGA48.jpg" },
+      { id: "SH-PGA58-R", producto: "Shure PGA-58 (réplica)", marca: "Shure", categoria: "Audio", stock: 3, precio: 80.0, imagen: "images/SH-PGA58-R.jpg" },
+      { id: "SH-SM58-R", producto: "Shure SM-58 (réplica)", marca: "Shure", categoria: "Audio", stock: 2, precio: 100.0, imagen: "images/SH-SM58-R.jpg" },
+      { id: "SH-BETA57A", producto: "Shure Beta 57A", marca: "Shure", categoria: "Audio", stock: 2, precio: 130.0, imagen: "images/SH-BETA57A.jpg" },
+      { id: "HM-01", producto: "Máquina de humo (unidad)", marca: "Genérica", categoria: "Tecnología", stock: 2, precio: 130.0, imagen: "images/HM-01.jpg" },
+      { id: "EALSEN-1", producto: "Micrófono inalámbrico Ealsen", marca: "Ealsen", categoria: "Audio", stock: 2, precio: 120.0, imagen: "images/EALSEN-1.jpg" },
+      { id: "ONTOP-HIGH", producto: "Micrófono gama alta On-TOP", marca: "On-TOP", categoria: "Audio", stock: 1, precio: 550.0, imagen: "images/ONTOP-HIGH.jpg" },
+      { id: "BB-BT668N", producto: "BlackBlack BT-668N", marca: "BlackBlack", categoria: "Audio", stock: 1, precio: 140.0, imagen: "images/BB-BT668N.jpg" },
+      { id: "TUMAN-X4", producto: "Micrófono x4 Tuman (pack)", marca: "Tuman", categoria: "Audio", stock: 5, precio: 280.0, imagen: "images/TUMAN-X4.jpg" },
+      { id: "OP-9011B", producto: "Kit Solar / Linterna OPALUX", marca: "Opalux", categoria: "Tecnología", stock: 20, precio: 120.0, imagen: "images/OP-9011B.jpg" },
+      { id: "BT-149-C", producto: "SET-5 Colores Bolsa / Esponja Micrófono “Batblack”", marca: "Batblack", categoria: "Audio", stock: 5, precio: 16.0, imagen: "images/BT-149-C.jpg" },
+      { id: "PSBRS", producto: "Consola Digital PRO SERIES (8 canales)", marca: "ProSeries", categoria: "Audio", stock: 2, precio: 450.0, imagen: "images/PSBRS.jpg" },
+      { id: "BT-U168", producto: "Micrófono Pro Batblack inalámbrico UHF", marca: "Batblack", categoria: "Audio", stock: 2, precio: 420.0, imagen: "images/BT-U168.jpg" },
+      { id: "BT-4D2C", producto: "Consola Amplificada Batblack 600W", marca: "Batblack", categoria: "Audio", stock: 1, precio: 450.9, imagen: "images/BT-4D2C.jpg" },
+      { id: "CAJA15B", producto: "Caja Amplificada 15”", marca: "Genérica", categoria: "Audio", stock: 2, precio: 900.0, imagen: "images/CAJA15B.jpg" },
+      { id: "CHARG-USB-C", producto: "Cargador Rápido USB-C", marca: "Genérica", categoria: "Tecnología", stock: 10, precio: 8.0, imagen: "images/CHARG-USB-C.jpg" },
+      { id: "SOP-MAG", producto: "Soporte Magnético Celular", marca: "Genérica", categoria: "Tecnología", stock: 8, precio: 35.0, imagen: "images/SOP-MAG.jpg" },
+      { id: "BTD9G", producto: "Micrófono profesional Batblack inalámbrico UHF", marca: "Batblack", categoria: "Audio", stock: 11, precio: 259.0, imagen: "images/BTD9G.jpg" },
+      { id: "BTN-58B", producto: "Micrófono Batblack dinámico profesional unidireccional", marca: "Batblack", categoria: "Audio", stock: 4, precio: 75.0, imagen: "images/BTN-58B.jpg" },
+      { id: "BTP4X", producto: "Mixer 4 canales profesional Batblack 15V", marca: "Batblack", categoria: "Audio", stock: 3, precio: 220.0, imagen: "images/BTP4X.jpg" },
+      { id: "SNH", producto: "Micrófono Sennheiser E85", marca: "Sennheiser", categoria: "Audio", stock: 0, precio: 120.0, imagen: "images/SNH.jpg" }
     ];
+
     const productList = document.getElementById("productList");
     const searchInput = document.getElementById("searchInput");
     const categoryFilter = document.getElementById("categoryFilter");
@@ -201,13 +200,12 @@
 
       list.forEach(p => {
         const stockClass = p.stock <= 2 ? "low-stock" : "in-stock";
-        const icon = p.categoria === "Audio" ? "bi-mic" : "bi-cpu";
+        const imgSrc = p.imagen ? p.imagen : "images/default.jpg";
+
         productList.innerHTML += `
           <div class="col" data-price="${p.precio}" data-category="${p.categoria}">
             <div class="inventory-card p-3 h-100 d-flex flex-column">
-              <div class="product-image-placeholder mb-3 rounded-top">
-                <i class="bi ${icon}"></i>
-              </div>
+              <img src="${imgSrc}" alt="${p.producto}" class="product-image mb-3" onerror="this.src='images/default.jpg'">
               <h5 class="text-white">${p.producto}</h5>
               <p class="text-secondary flex-grow-1">Marca: ${p.marca} (ID: ${p.id})</p>
               <div class="d-flex justify-content-between align-items-center mt-2">
