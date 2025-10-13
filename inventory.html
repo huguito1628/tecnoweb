@@ -205,7 +205,7 @@
         productList.innerHTML += `
           <div class="col" data-price="${p.precio}" data-category="${p.categoria}">
             <div class="inventory-card p-3 h-100 d-flex flex-column">
-              <img src="${imgSrc}" alt="${p.producto}" class="product-image mb-3" onerror="this.src='images/default.jpg'">
+              <img src="${imgSrc}" alt="${p.producto}" class="product-image mb-3" onerror="if(!this.dataset.fallback){this.dataset.fallback='true';this.src='images/default.jpg';}">
               <h5 class="text-white">${p.producto}</h5>
               <p class="text-secondary flex-grow-1">Marca: ${p.marca} (ID: ${p.id})</p>
               <div class="d-flex justify-content-between align-items-center mt-2">
