@@ -202,12 +202,30 @@
   document.getElementById('productosCard').addEventListener('click', () => {
     window.location.href = 'inventory.html';
   });
+  document.getElementById('ventasCard').addEventListener('click', () => {
+    window.location.href = 'orders.html'; 
+  
+  });
+
 
   // Sidebar responsive
   const sidebar = document.getElementById("sidebar");
   document.getElementById("menuToggle").addEventListener("click", () => sidebar.classList.add("show-sidebar"));
   document.getElementById("closeSidebar").addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
 </script>
+<script>
+  // Mostrar el nombre del usuario logueado (solo la parte antes del @)
+  if (sessionUser) {
+    const username = sessionUser.split('@')[0]; // toma solo lo anterior al @
+    document.getElementById('userEmail').textContent = username;
+  }
 
+  // Cerrar sesión
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('sessionActive');
+    localStorage.removeItem('sessionUser');
+    window.location.href = 'auth.html';
+  });
+</script>
 </body>
 </html>
