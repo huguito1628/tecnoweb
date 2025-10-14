@@ -285,5 +285,20 @@
     document.getElementById("menuToggle").addEventListener("click", () => sidebar.classList.add("show-sidebar"));
     document.getElementById("closeSidebar").addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Cerrar sesión
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('sessionActive');
+        localStorage.removeItem('sessionUser');
+        window.location.href = 'auth.html';
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
