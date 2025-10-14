@@ -300,6 +300,23 @@
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="inventory.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Cerrar sesión
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('sessionActive');
+        localStorage.removeItem('sessionUser');
+        window.location.href = 'auth.html';
+      });
+    }
+  });
+</script>
+
+<script src="inventory.js"></script>
 </body>
 </html>
+
 
