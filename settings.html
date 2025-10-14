@@ -486,5 +486,20 @@
     if (localStorage.getItem("hideSensitive") === "true") document.getElementById("hideSensitive").checked = true;
 
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Cerrar sesión
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('sessionActive');
+        localStorage.removeItem('sessionUser');
+        window.location.href = 'auth.html';
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
