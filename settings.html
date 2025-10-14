@@ -56,6 +56,7 @@
   </style>
 
   <script>
+    // Protección de sesión básica (redirige si no hay sesión válida)
     const sessionActive = localStorage.getItem('sessionActive');
     const sessionUser = localStorage.getItem('sessionUser');
     if (sessionActive !== 'true' || !sessionUser) {
@@ -140,7 +141,7 @@
             <div class="col-12 col-lg-6">
               <div class="setting-card">
                 <h5><i class="bi bi-shield-lock"></i> Seguridad y Acceso</h5>
-                <p class="text-secondary">Configura la seguridad de tu cuenta.</p>
+                <p class="text-secondary">Verifica tu identidad antes de actualizar la contraseña.</p>
 
                 <div class="form-check form-switch mb-2">
                   <input class="form-check-input" type="checkbox" id="twoFactor" checked>
@@ -153,9 +154,15 @@
                 </div>
 
                 <form id="passwordForm">
-                  <label class="form-label">Actualizar contraseña</label>
+                  <label class="form-label">Contraseña actual</label>
+                  <input type="password" id="currentPass" class="form-control mb-2" placeholder="Contraseña actual" required>
+
+                  <label class="form-label">Nueva contraseña</label>
                   <input type="password" id="newPass" class="form-control mb-2" placeholder="Nueva contraseña" required>
+
+                  <label class="form-label">Confirmar nueva contraseña</label>
                   <input type="password" id="confirmPass" class="form-control mb-3" placeholder="Confirmar contraseña" required>
+
                   <button type="submit" class="btn btn-outline-light w-100">Actualizar Contraseña</button>
                 </form>
               </div>
@@ -205,24 +212,36 @@
               </div>
             </div>
 
-            <!-- Sesión -->
+            <!-- Sesión e Inactividad -->
             <div class="col-12">
               <div class="setting-card">
                 <h5><i class="bi bi-clock-history"></i> Sesión e Inactividad</h5>
-                <p class="text-secondary">Configura cuánto tiempo puede estar abierta la sesión sin actividad.</p>
+                <p class="text-secondary">Configura cuánto tiempo puede estar abierta la sesión sin actividad. Si "Bloqueo automático" está activado, la sesión se cerrará cuando expire el tiempo.</p>
 
                 <div class="row g-3 align-items-center">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
+                    <label class="form-label">Tiempo (min)</label>
                     <select id="sessionTimeout" class="form-select">
-                      <option value="5">5 minutos</option>
-                      <option value="10" selected>10 minutos</option>
-                      <option value="20">20 minutos</option>
-                      <option value="30">30 minutos</option>
+                      <option value="1">1</option>
+                      <option value="5">5</option>
+                      <option value="10" selected>10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
                     </select>
                   </div>
-                  <div class="col-md-8">
+
+                  <div class="col-md-3">
+                    <label class="form-label">Advertencia (seg)</label>
+                    <input type="number" id="warningSeconds" class="form-control" min="5" value="30" title="Segundos antes de cerrar sesión para avisar">
+                  </div>
+
+                  <div class="col-md-6 d-grid">
                     <button class="btn btn-light w-100" id="saveSessionSettings">Guardar Configuración</button>
                   </div>
+                </div>
+
+                <div class="mt-3">
+                  <small class="text-secondary">Última actividad: <span id="lastActivity">ahora</span></small>
                 </div>
               </div>
             </div>
@@ -233,44 +252,239 @@
     </main>
   </div>
 
+  <!-- Modal de advertencia antes de cerrar sesión -->
+  <div class="modal fade" id="sessionWarningModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Advertencia de Inactividad</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">No se detectó actividad. La sesión se cerrará en <strong id="countdownWarn">30</strong> segundos, a menos que interactúes con la página.</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" id="stayLoggedBtn">Permanecer conectado</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // ---------- ELEMENTOS ----------
     const sidebar = document.getElementById("sidebar");
-    document.getElementById("menuToggle").addEventListener("click", () => sidebar.classList.add("show-sidebar"));
-    document.getElementById("closeSidebar").addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
+    const menuToggle = document.getElementById("menuToggle");
+    const closeSidebar = document.getElementById("closeSidebar");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const profileImageInput = document.getElementById("profileImage");
+    const profilePreview = document.getElementById("profilePreview");
+    const saveSessionSettingsBtn = document.getElementById("saveSessionSettings");
+    const sessionTimeoutSelect = document.getElementById("sessionTimeout");
+    const autoLockCheckbox = document.getElementById("autoLock");
+    const lastActivityLabel = document.getElementById("lastActivity");
+    const warningSecondsInput = document.getElementById("warningSeconds");
+    const sessionWarningModal = new bootstrap.Modal(document.getElementById('sessionWarningModal'));
+    const countdownWarnEl = document.getElementById('countdownWarn');
+    const stayLoggedBtn = document.getElementById('stayLoggedBtn');
 
-    // Previsualización de imagen
-    document.getElementById("profileImage").addEventListener("change", (e) => {
+    // ---------- SIDEBAR ----------
+    menuToggle.addEventListener("click", () => sidebar.classList.add("show-sidebar"));
+    closeSidebar.addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
+
+    // ---------- PERFIL PREVIEW ----------
+    profileImageInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (ev) => document.getElementById("profilePreview").src = ev.target.result;
+        reader.onload = (ev) => profilePreview.src = ev.target.result;
         reader.readAsDataURL(file);
       }
     });
 
-    // Guardar perfil
-    document.getElementById("saveProfileBtn").addEventListener("click", () => {
+    saveProfileBtn.addEventListener("click", () => {
       const name = document.getElementById("displayName").value;
+      // Aquí podrías guardar en backend o localStorage
       alert(`✅ Perfil actualizado. Bien hecho, ${name || "usuario"}!`);
     });
 
-    // Cambio de contraseña
+    // ---------- CONTRASEÑA (verificación actual) ----------
+    // Simulación: contraseña almacenada en localStorage (solo demo)
+    if (!localStorage.getItem("userPassword")) localStorage.setItem("userPassword", "admin123");
+
     document.getElementById("passwordForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const pass = document.getElementById("newPass").value;
+      const current = document.getElementById("currentPass").value;
+      const newPass = document.getElementById("newPass").value;
       const confirm = document.getElementById("confirmPass").value;
-      if (pass !== confirm) return alert("❌ Las contraseñas no coinciden.");
+      const stored = localStorage.getItem("userPassword");
+
+      if (current !== stored) {
+        alert("❌ La contraseña actual es incorrecta.");
+        return;
+      }
+      if (newPass !== confirm) {
+        alert("❌ Las contraseñas nuevas no coinciden.");
+        return;
+      }
+
+      localStorage.setItem("userPassword", newPass);
       alert("🔐 Contraseña actualizada correctamente.");
       e.target.reset();
     });
 
-    // Guardar tiempo de sesión
-    document.getElementById("saveSessionSettings").addEventListener("click", () => {
-      const timeout = document.getElementById("sessionTimeout").value;
-      localStorage.setItem("sessionTimeout", timeout);
-      alert(`✅ Tiempo de sesión configurado en ${timeout} minutos.`);
+    // ---------- NOTIFICACIONES & PRIVACIDAD (placeholders) ----------
+    // Las opciones son guardadas localmente si quieres persistirlas
+    document.getElementById("notifUsers").addEventListener("change", (e) => localStorage.setItem("notifUsers", e.target.checked));
+    document.getElementById("notifStock").addEventListener("change", (e) => localStorage.setItem("notifStock", e.target.checked));
+    document.getElementById("notifReports").addEventListener("change", (e) => localStorage.setItem("notifReports", e.target.checked));
+    document.getElementById("showOnlineStatus").addEventListener("change", (e) => localStorage.setItem("showOnlineStatus", e.target.checked));
+    document.getElementById("showActivity").addEventListener("change", (e) => localStorage.setItem("showActivity", e.target.checked));
+    document.getElementById("hideSensitive").addEventListener("change", (e) => localStorage.setItem("hideSensitive", e.target.checked));
+    document.getElementById("twoFactor").addEventListener("change", (e) => localStorage.setItem("twoFactor", e.target.checked));
+    document.getElementById("notifUsers").checked = localStorage.getItem("notifUsers") === "true" || true; // default true
+    document.getElementById("notifStock").checked = localStorage.getItem("notifStock") === "true" || true; // default true
+    document.getElementById("notifReports").checked = localStorage.getItem("notifReports") === "true";
+
+    // ---------- SESIÓN E INACTIVIDAD ----------
+    // Parámetros y timer
+    let sessionTimer = null;
+    let warningTimer = null;
+    let countdownInterval = null;
+
+    // Cargar preferencia guardada (si existe)
+    function loadSessionSettings() {
+      const savedTimeout = localStorage.getItem("sessionTimeout");
+      const savedAutoLock = localStorage.getItem("autoLock");
+      const savedWarning = localStorage.getItem("warningSeconds");
+
+      if (savedTimeout) sessionTimeoutSelect.value = savedTimeout;
+      if (savedAutoLock === "true") autoLockCheckbox.checked = true;
+      if (savedWarning) warningSecondsInput.value = savedWarning;
+    }
+
+    loadSessionSettings();
+
+    // Actualiza etiqueta de última actividad
+    function updateLastActivityLabel() {
+      const now = new Date();
+      lastActivityLabel.textContent = now.toLocaleString();
+    }
+
+    // Crea / reinicia temporizador de sesión
+    function startSessionTimer() {
+      clearSessionTimer();
+
+      const minutes = parseInt(sessionTimeoutSelect.value, 10) || 10;
+      const ms = minutes * 60 * 1000;
+      const warningSec = parseInt(warningSecondsInput.value, 10) || 30;
+      const autoLock = autoLockCheckbox.checked;
+
+      // Solo activa comportamiento si autoLock está activado
+      if (!autoLock) return;
+
+      // Timer principal: al expirar, cerramos sesión
+      sessionTimer = setTimeout(() => {
+        // Si hay una advertencia configurada, mostramos modal y damos warningSec para reaccionar
+        if (warningSec > 0) {
+          let remaining = warningSec;
+          countdownWarnEl.textContent = remaining;
+          sessionWarningModal.show();
+
+          // Cuenta regresiva visible
+          countdownInterval = setInterval(() => {
+            remaining -= 1;
+            countdownWarnEl.textContent = remaining;
+            if (remaining <= 0) {
+              clearInterval(countdownInterval);
+            }
+          }, 1000);
+
+          // Después de warningSec seg, cerrar sesión si sigue sin actividad
+          warningTimer = setTimeout(() => {
+            sessionWarningModal.hide();
+            doAutoLogout();
+          }, warningSec * 1000);
+        } else {
+          // Sin advertencia: cerrar sesión ya mismo
+          doAutoLogout();
+        }
+      }, ms - (warningSec * 1000)); // lanzamos el aviso con suficiente antelación
+    }
+
+    function resetSessionTimer() {
+      updateLastActivityLabel();
+      // Si usuario interactúa mientras modal de advertencia está visible, lo detenemos
+      if (sessionWarningModal._isShown) {
+        // si estaba a punto de cerrar, cancelamos y reiniciamos
+        clearTimeout(warningTimer);
+        clearInterval(countdownInterval);
+        sessionWarningModal.hide();
+      }
+      clearSessionTimer();
+      startSessionTimer();
+    }
+
+    function clearSessionTimer() {
+      if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
+      if (warningTimer) { clearTimeout(warningTimer); warningTimer = null; }
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    }
+
+    function doAutoLogout() {
+      // Cierra sesión: limpia flags y redirige a auth.html
+      localStorage.removeItem('sessionActive');
+      localStorage.removeItem('sessionUser');
+      alert('Tu sesión ha sido cerrada por inactividad.');
+      window.location.href = 'auth.html';
+    }
+
+    // Guardar ajustes de sesión
+    saveSessionSettingsBtn.addEventListener("click", () => {
+      localStorage.setItem("sessionTimeout", sessionTimeoutSelect.value);
+      localStorage.setItem("autoLock", autoLockCheckbox.checked);
+      localStorage.setItem("warningSeconds", warningSecondsInput.value);
+      alert(`✅ Configuración de sesión guardada: ${sessionTimeoutSelect.value} min. Bloqueo automático: ${autoLockCheckbox.checked ? 'Sí' : 'No'}.`);
+      // Reiniciar temporizador con nuevas opciones
+      resetSessionTimer();
     });
+
+    // Reset del temporizador al pulsar "Permanecer conectado"
+    stayLoggedBtn.addEventListener("click", () => {
+      resetSessionTimer();
+    });
+
+    // Detectar actividad del usuario para reiniciar el temporizador
+    ['mousemove','mousedown','keypress','touchstart','click'].forEach(ev => {
+      document.addEventListener(ev, () => {
+        // solo reiniciamos si autoLock está activado
+        if (autoLockCheckbox.checked) resetSessionTimer();
+      }, { passive: true });
+    });
+
+    // Cambiar autoLock reinicia o detiene comportamiento
+    autoLockCheckbox.addEventListener("change", () => {
+      localStorage.setItem("autoLock", autoLockCheckbox.checked);
+      if (autoLockCheckbox.checked) startSessionTimer();
+      else clearSessionTimer();
+    });
+
+    // Inicializar última actividad y temporizador al cargar página
+    updateLastActivityLabel();
+    if (autoLockCheckbox.checked) startSessionTimer();
+
+    // Antes de abandonar la pestaña (ej. cerrar o recargar), actualizamos lastActivity (opcional)
+    window.addEventListener("beforeunload", () => {
+      localStorage.setItem("lastActivity", new Date().toISOString());
+    });
+
+    // ---------- Inicialización de valores guardados (otros ajustes) ----------
+    // Privacidad / notificaciones / twoFactor
+    if (localStorage.getItem("twoFactor") === "true") document.getElementById("twoFactor").checked = true;
+    if (localStorage.getItem("showOnlineStatus") === "false") document.getElementById("showOnlineStatus").checked = false;
+    if (localStorage.getItem("showActivity") === "true") document.getElementById("showActivity").checked = true;
+    if (localStorage.getItem("hideSensitive") === "true") document.getElementById("hideSensitive").checked = true;
+
   </script>
 </body>
 </html>
