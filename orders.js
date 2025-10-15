@@ -150,3 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializar tabla al cargar la página
   actualizarTablaPedidos();
 });
+
+// Sidebar responsive (abrir/cerrar)
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+    const closeSidebar = document.getElementById("closeSidebar");
+
+    if (menuToggle && sidebar && closeSidebar) {
+      menuToggle.addEventListener("click", () => sidebar.classList.add("show-sidebar"));
+      closeSidebar.addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
+    }
+  });
+
