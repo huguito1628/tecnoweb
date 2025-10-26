@@ -115,7 +115,11 @@
       <header class="topbar d-flex justify-content-between align-items-center">
         <button class="btn btn-outline-light d-md-none" id="menuToggle"><i class="bi bi-list fs-2"></i></button>
         <h3 class="mb-0"><i class="bi bi-people"></i> Gestión de Usuarios</h3>
-        <button class="btn btn-sm btn-outline-light" id="unlockSensitiveBtn"><i class="bi bi-shield-lock"></i> Desbloquear Datos</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-light" id="unlockSensitiveBtn"><i class="bi bi-shield-lock"></i> Administrador</button>
+          <button class="btn btn-sm btn-warning d-none" id="showDataBtn"><i class="bi bi-eye"></i> Mostrar Datos</button>
+          <button class="btn btn-sm btn-success d-none" id="addUserBtn"><i class="bi bi-person-plus"></i> Agregar Usuario</button>
+        </div>
       </header>
 
       <section class="content-section mt-4">
@@ -176,129 +180,64 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const users = [
-      { nombre: "Carlos Medina", cargo: "Administrador", estado: "Activo", telefono: "987654321", correo: "carlos@empresa.com", dni: "70891234", foto: "images/user1.jpg" },
-      { nombre: "Ana López", cargo: "Supervisor", estado: "Activo", telefono: "999887766", correo: "ana@empresa.com", dni: "70654321", foto: "images/user2.jpg" },
-      { nombre: "Luis Torres", cargo: "Vendedor", estado: "Inactivo", telefono: "988776655", correo: "luis@empresa.com", dni: "70112233", foto: "images/user3.jpg" },
-      { nombre: "María Paredes", cargo: "Vendedor", estado: "Activo", telefono: "912345678", correo: "maria@empresa.com", dni: "70456789", foto: "images/user4.jpg" }
-    ];
-
-    const ADMIN_PASSWORD = "admin123"; // 🔒 cámbiala por la real
-
-    const userList = document.getElementById("userList");
-    const searchInput = document.getElementById("searchInput");
-    const roleFilter = document.getElementById("roleFilter");
-    const statusFilter = document.getElementById("statusFilter");
-    const noResults = document.getElementById("noResultsMessage");
-
-    // 🔧 función anti-loop para imágenes rotas
-    function safeImageError(img) {
-      if (!img.dataset.fallback) { // Solo entra una vez
-        img.dataset.fallback = "true";
-        img.src = "images/default-user.jpg";
-      }
-    }
-
-    function renderUsers(list, showSensitive = false) {
-      userList.innerHTML = "";
-      if (list.length === 0) {
-        noResults.classList.remove("d-none");
-        return;
-      }
-      noResults.classList.add("d-none");
-
-      const fragment = document.createDocumentFragment();
-
-      list.forEach(u => {
-        const col = document.createElement("div");
-        col.className = "col";
-
-        const sensitiveClass = showSensitive ? "" : "locked";
-        const telefono = showSensitive ? u.telefono : "•••••••••";
-        const correo = showSensitive ? u.correo : "•••••••••";
-        const dni = showSensitive ? u.dni : "•••••••••";
-
-        col.innerHTML = `
-          <div class="user-card p-3 d-flex flex-column align-items-center text-center">
-            <img src="${u.foto}" class="profile-image mb-3" alt="${u.nombre}">
-            <h5 class="text-white mb-1">${u.nombre}</h5>
-            <p class="text-secondary mb-1">${u.cargo}</p>
-            <span class="badge ${u.estado === 'Activo' ? 'bg-success' : 'bg-secondary'} mb-2">${u.estado}</span>
-            <div class="w-100 mt-2">
-              <p class="sensitive ${sensitiveClass}"><i class="bi bi-telephone"></i> ${telefono}</p>
-              <p class="sensitive ${sensitiveClass}"><i class="bi bi-envelope"></i> ${correo}</p>
-              <p class="sensitive ${sensitiveClass}"><i class="bi bi-person-vcard"></i> ${dni}</p>
+  <!-- Modal agregar usuario -->
+  <div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title"><i class="bi bi-person-plus"></i> Nuevo Usuario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addUserForm">
+            <div class="mb-2">
+              <label class="form-label">Nombre completo</label>
+              <input type="text" class="form-control bg-dark text-light border-secondary" id="newNombre" required>
             </div>
-          </div>`;
-        fragment.appendChild(col);
+            <div class="mb-2">
+              <label class="form-label">Cargo</label>
+              <select class="form-select bg-dark text-light border-secondary" id="newCargo" required>
+                <option value="">Seleccione...</option>
+                <option>Administrador</option>
+                <option>Supervisor</option>
+                <option>Vendedor</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Estado</label>
+              <select class="form-select bg-dark text-light border-secondary" id="newEstado" required>
+                <option>Activo</option>
+                <option>Inactivo</option>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-control bg-dark text-light border-secondary" id="newTelefono" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Correo</label>
+              <input type="email" class="form-control bg-dark text-light border-secondary" id="newCorreo" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">DNI</label>
+              <input type="text" class="form-control bg-dark text-light border-secondary" id="newDNI" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Foto (URL o ruta)</label>
+              <input type="text" class="form-control bg-dark text-light border-secondary" id="newFoto" placeholder="images/user.jpg">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" form="addUserForm" class="btn btn-success">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        // prevenir bucles de carga de imágenes inexistentes
-        const img = col.querySelector("img");
-        img.onerror = () => safeImageError(img);
-      });
-
-      userList.appendChild(fragment);
-    }
-
-    function applyFilters() {
-      const search = searchInput.value.toLowerCase();
-      const role = roleFilter.value;
-      const status = statusFilter.value;
-
-      const filtered = users.filter(u =>
-        (role === "all" || u.cargo === role) &&
-        (status === "all" || u.estado === status) &&
-        (u.nombre.toLowerCase().includes(search) || u.cargo.toLowerCase().includes(search))
-      );
-      renderUsers(filtered, showSensitive);
-    }
-
-    let showSensitive = false;
-    renderUsers(users);
-
-    searchInput.addEventListener("input", applyFilters);
-    roleFilter.addEventListener("change", applyFilters);
-    statusFilter.addEventListener("change", applyFilters);
-
-    document.getElementById("unlockSensitiveBtn").addEventListener("click", () => {
-      const modal = new bootstrap.Modal(document.getElementById("adminPassModal"));
-      document.getElementById("adminPassword").value = "";
-      modal.show();
-    });
-
-    document.getElementById("confirmPasswordBtn").addEventListener("click", () => {
-      const pass = document.getElementById("adminPassword").value;
-      if (pass === ADMIN_PASSWORD) {
-        showSensitive = true;
-        renderUsers(users, true);
-        bootstrap.Modal.getInstance(document.getElementById("adminPassModal")).hide();
-        alert("✅ Datos sensibles desbloqueados correctamente.");
-      } else {
-        alert("❌ Contraseña incorrecta.");
-      }
-    });
-
-    // Sidebar móvil
-    const sidebar = document.getElementById("sidebar");
-    document.getElementById("menuToggle").addEventListener("click", () => sidebar.classList.add("show-sidebar"));
-    document.getElementById("closeSidebar").addEventListener("click", () => sidebar.classList.remove("show-sidebar"));
-  </script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Cerrar sesión
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('sessionActive');
-        localStorage.removeItem('sessionUser');
-        window.location.href = 'auth.html';
-      });
-    }
-  });
-</script>
-
+  <!-- Bootstrap + Script externo -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="users.js"></script>
 </body>
 </html>
